@@ -1,0 +1,20 @@
+C:\Users\Maintenant prêt\source\repos\test 1\x64\Debug\sfml-graphics-d-3.dll
+C:\Users\Maintenant prêt\source\repos\test 1\x64\Debug\sfml-window-d-3.dll
+C:\Users\Maintenant prêt\source\repos\test 1\x64\Debug\sfml-system-d-3.dll
+C:\Users\Maintenant prêt\source\repos\test 1\x64\Debug\freetyped.dll
+C:\Users\Maintenant prêt\source\repos\test 1\x64\Debug\zlibd1.dll
+C:\Users\Maintenant prêt\source\repos\test 1\x64\Debug\bz2d.dll
+C:\Users\Maintenant prêt\source\repos\test 1\x64\Debug\libpng16d.dll
+C:\Users\Maintenant prêt\source\repos\test 1\x64\Debug\brotlidec.dll
+C:\Users\Maintenant prêt\source\repos\test 1\x64\Debug\brotlicommon.dll
+C:\Users\Maintenant prêt\source\repos\test 1\test 1\x64\Debug\test 1.vcxproj.Up2Date
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\x64\Debug\sfml-graphics-d-3.dll
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\x64\Debug\sfml-window-d-3.dll
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\x64\Debug\sfml-system-d-3.dll
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\x64\Debug\freetyped.dll
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\x64\Debug\zlibd1.dll
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\x64\Debug\bz2d.dll
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\x64\Debug\libpng16d.dll
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\x64\Debug\brotlidec.dll
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\x64\Debug\brotlicommon.dll
+C:\ecole\git\c++\projet2\Hana-no-saku-ki\test 1\x64\Debug\test 1.vcxproj.Up2Date
