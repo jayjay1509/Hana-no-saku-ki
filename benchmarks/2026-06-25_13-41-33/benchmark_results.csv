@@ -1,0 +1,12 @@
+metric,value
+duration_seconds,10
+frames,568
+average_frame_ms,17.606
+average_simulation_ms,0.649805
+average_render_ms,13.0718
+average_interface_ms,0.345932
+min_frame_ms,15.6801
+max_frame_ms,37.9656
+water_cells,1649
+wall_cells,376
+total_mass,3074.97

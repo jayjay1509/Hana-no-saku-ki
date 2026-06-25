@@ -4,16 +4,68 @@
 #include <algorithm>
 #include <tracy/Tracy.hpp>
 
-std::vector<std::vector<Cell>> grid(largeur, std::vector<Cell>(hauteur));
+std::vector<Cell> grid(largeur * hauteur);
+
+namespace
+{
+    std::vector<Cell> nextGrid(largeur * hauteur);
+
+    Cell &nextCellAt(int x, int y)
+    {
+        return nextGrid[gridIndex(x, y)];
+    }
+
+    void clearNextGrid()
+    {
+        ZoneScopedN("clearNextGrid");
+
+        std::fill(nextGrid.begin(), nextGrid.end(), Cell{});
+    }
+
+    void restoreWalls()
+    {
+        ZoneScopedN("restoreWalls");
+
+        for (int y = 0; y < largeur; y++)
+        {
+            for (int x = 0; x < hauteur; x++)
+            {
+                if (cellAt(x, y).type == WALL)
+                    nextCellAt(x, y).type = WALL;
+            }
+        }
+    }
+
+    void addWater(int x, int y, float mass)
+    {
+        Cell &target = nextCellAt(x, y);
+
+        if (mass <= MIN_MASS || target.type == WALL)
+            return;
+
+        target.mass += mass;
+        target.type = WATER;
+    }
+}
 
 bool inBounds(int x, int y)
 {
     return y >= 0 && y < largeur && x >= 0 && x < hauteur;
 }
 
+int gridIndex(int x, int y)
+{
+    return y * hauteur + x;
+}
+
+Cell &cellAt(int x, int y)
+{
+    return grid[gridIndex(x, y)];
+}
+
 bool isSolid(int x, int y)
 {
-    return !inBounds(x, y) || grid[y][x].type == WALL;
+    return !inBounds(x, y) || cellAt(x, y).type == WALL;
 }
 
 float getStableState(float totalMass)
@@ -39,11 +91,40 @@ float applyFlowSettings(float flow)
     return flow;
 }
 
+GridStats computeGridStats()
+{
+    ZoneScopedN("computeGridStats");
+
+    GridStats stats;
+
+    for (int y = 0; y < largeur; y++)
+    {
+        for (int x = 0; x < hauteur; x++)
+        {
+            const Cell &cell = cellAt(x, y);
+
+            if (cell.type == WATER && cell.mass > MIN_MASS)
+            {
+                stats.waterCells++;
+                stats.totalMass += cell.mass;
+            }
+            else if (cell.type == WALL)
+            {
+                stats.wallCells++;
+            }
+        }
+    }
+
+    return stats;
+}
+
 void updateFluid()
 {
     ZoneScopedN("updateFluid");
 
-    auto newGrid = grid;
+    clearNextGrid();
+    restoreWalls();
+
     static bool scanLeftToRight = true;
     int startX = 0;
     int endX = hauteur;
@@ -60,27 +141,25 @@ void updateFluid()
     {
         for (int x = startX; x != endX; x += stepX)
         {
-            Cell &cell = grid[y][x];
+            Cell &cell = cellAt(x, y);
 
             if (cell.type != WATER || cell.mass <= MIN_MASS)
                 continue;
 
-            float mass = cell.mass;
+            float remainingMass = cell.mass;
 
             
             if (!isSolid(x, y + 1))
             {
-                float below = grid[y + 1][x].mass;
-                float flow = getStableState(mass + below) - below;
-                flow = std::max(0.f, std::min(flow, mass));
+                float below = cellAt(x, y + 1).mass;
+                float flow = getStableState(cell.mass + below) - below;
+                flow = std::max(0.f, std::min(flow, remainingMass));
                 flow = applyFlowSettings(flow);
 
                 if (flow > MIN_MASS)
                 {
-                    newGrid[y][x].mass -= flow;
-                    newGrid[y + 1][x].mass += flow;
-                    newGrid[y + 1][x].type = WATER;
-                    mass -= flow;
+                    addWater(x, y + 1, flow);
+                    remainingMass -= flow;
                 }
             }
 
@@ -98,52 +177,38 @@ void updateFluid()
             {
                 if (isSolid(x + dir, y)) continue;
 
-                float side = grid[y][x + dir].mass;
-                float flow = (mass - side) / 4.0f;
-                flow = std::max(0.f, std::min(flow, mass));
+                float side = cellAt(x + dir, y).mass;
+                float flow = (remainingMass - side) / 4.0f;
+                flow = std::max(0.f, std::min(flow, remainingMass));
                 flow = applyFlowSettings(flow);
 
                 if (flow > MIN_MASS)
                 {
-                    newGrid[y][x].mass -= flow;
-                    newGrid[y][x + dir].mass += flow;
-                    newGrid[y][x + dir].type = WATER;
-                    mass -= flow;
+                    addWater(x + dir, y, flow);
+                    remainingMass -= flow;
                 }
             }
 
             // ↑ UP (pression)
             if (!isSolid(x, y - 1))
             {
-                float above = grid[y - 1][x].mass;
-                float flow = mass - getStableState(mass + above);
-                flow = std::max(0.f, std::min(flow, mass));
+                float above = cellAt(x, y - 1).mass;
+                float flow = remainingMass - getStableState(remainingMass + above);
+                flow = std::max(0.f, std::min(flow, remainingMass));
                 flow = applyFlowSettings(flow);
 
                 if (flow > MIN_MASS)
                 {
-                    newGrid[y][x].mass -= flow;
-                    newGrid[y - 1][x].mass += flow;
-                    newGrid[y - 1][x].type = WATER;
-                    mass -= flow;
+                    addWater(x, y - 1, flow);
+                    remainingMass -= flow;
                 }
             }
 
-            // Nettoyage
-            if (newGrid[y][x].mass <= MIN_MASS)
-            {
-                newGrid[y][x].mass = 0.0f;
-                if (newGrid[y][x].type != WALL)
-                    newGrid[y][x].type = EMPTY;
-            }
-            else
-            {
-                newGrid[y][x].type = WATER;
-            }
+            addWater(x, y, remainingMass);
         }
     }
 
-    grid = newGrid;
+    std::swap(grid, nextGrid);
 
     if (settings.alternateUpdateDirection)
         scanLeftToRight = !scanLeftToRight;
@@ -151,5 +216,50 @@ void updateFluid()
 
 void resetGrid()
 {
-    grid = std::vector<std::vector<Cell>>(largeur, std::vector<Cell>(hauteur));
+    grid = std::vector<Cell>(largeur * hauteur);
+    nextGrid = std::vector<Cell>(largeur * hauteur);
+}
+
+void loadBenchmarkScene()
+{
+    resetGrid();
+
+    for (int x = 20; x < hauteur - 20; x++)
+    {
+        cellAt(x, largeur - 12).type = WALL;
+        cellAt(x, largeur - 12).mass = 0.0f;
+    }
+
+    for (int y = 45; y < largeur - 12; y++)
+    {
+        cellAt(20, y).type = WALL;
+        cellAt(20, y).mass = 0.0f;
+
+        cellAt(hauteur - 21, y).type = WALL;
+        cellAt(hauteur - 21, y).mass = 0.0f;
+    }
+
+    for (int x = 55; x < 145; x++)
+    {
+        cellAt(x, 78).type = WALL;
+        cellAt(x, 78).mass = 0.0f;
+    }
+
+    for (int y = 25; y < 70; y++)
+    {
+        for (int x = 70; x < 130; x++)
+        {
+            cellAt(x, y).type = WATER;
+            cellAt(x, y).mass = MAX_MASS;
+        }
+    }
+
+    for (int y = 15; y < 30; y++)
+    {
+        for (int x = 30; x < 55; x++)
+        {
+            cellAt(x, y).type = WATER;
+            cellAt(x, y).mass = MAX_MASS;
+        }
+    }
 }

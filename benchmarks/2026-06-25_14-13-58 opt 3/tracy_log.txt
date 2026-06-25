@@ -1,0 +1,22 @@
+Tracy capture command:
+"C:\ecole\git\c++\projet2\Hana-no-saku-ki\tracy\tracy-capture.exe" -a 127.0.0.1 -p 8086 -o "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_14-13-58\benchmark_capture.tracy" -f -s 10 >> "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_14-13-58\tracy_log.txt" 2>&1
+
+tracy-capture attempt 1 / 3
+Connecting to 127.0.0.1:8086...
+Queue delay: 29 ns
+Timer resolution: 6 ns
+
+Frames: 1733
+Time span: 29.95 s
+Zones: 13,857
+Elapsed time: 10.04 s
+Saving trace... done!
+Trace size 95.04 KB (24.00% ratio)
+
+tracy-capture exit code: 0
+
+Tracy CSV export command:
+"C:\ecole\git\c++\projet2\Hana-no-saku-ki\tracy\tracy-csvexport.exe" "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_14-13-58\benchmark_capture.tracy" > "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_14-13-58\benchmark_zones.csv" 2>> "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_14-13-58\tracy_log.txt"
+
+
+tracy-csvexport exit code: 0

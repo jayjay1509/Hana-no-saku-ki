@@ -1,0 +1,31 @@
+Tracy capture command:
+"C:\ecole\git\c++\projet2\Hana-no-saku-ki\tracy\tracy-capture.exe" -a 127.0.0.1 -p 8086 -o "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_14-17-11\benchmark_capture.tracy" -f -s 10 >> "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_14-17-11\tracy_log.txt" 2>&1
+
+tracy-capture attempt 1 / 3
+Connecting to 127.0.0.1:8086...
+The client you are trying to connect to is no longer able to sent profiling data,
+because another server was already connected to it.
+You can do the following:
+
+  1. Restart the client application.
+  2. Rebuild the client application with on-demand mode enabled.
+tracy-capture attempt 2 / 3
+Connecting to 127.0.0.1:8086...
+The client you are trying to connect to is no longer able to sent profiling data,
+because another server was already connected to it.
+You can do the following:
+
+  1. Restart the client application.
+  2. Rebuild the client application with on-demand mode enabled.
+tracy-capture attempt 3 / 3
+Connecting to 127.0.0.1:8086...
+The client you are trying to connect to is no longer able to sent profiling data,
+because another server was already connected to it.
+You can do the following:
+
+  1. Restart the client application.
+  2. Rebuild the client application with on-demand mode enabled.
+
+tracy-capture exit code: 2
+No benchmark_capture.tracy file was created, skipping tracy-csvexport.
+The application benchmark CSV files are still valid.

@@ -65,10 +65,10 @@ void handleInput(sf::RenderWindow &window)
         {
             for (int xx = x - brushSize + 1; xx <= x + brushSize - 1; xx++)
             {
-                if (inBrush(x, y, xx, yy) && inBounds(xx, yy) && grid[yy][xx].type != WALL)
+                if (inBrush(x, y, xx, yy) && inBounds(xx, yy) && cellAt(xx, yy).type != WALL)
                 {
-                    grid[yy][xx].mass = MAX_MASS;
-                    grid[yy][xx].type = WATER;
+                    cellAt(xx, yy).mass = MAX_MASS;
+                    cellAt(xx, yy).type = WATER;
                 }
             }
         }
@@ -85,8 +85,8 @@ void handleInput(sf::RenderWindow &window)
             {
                 if (inBrush(x, y, xx, yy) && inBounds(xx, yy))
                 {
-                    grid[yy][xx].type = WALL;
-                    grid[yy][xx].mass = 0.0f;
+                    cellAt(xx, yy).type = WALL;
+                    cellAt(xx, yy).mass = 0.0f;
                 }
             }
         }
@@ -101,8 +101,8 @@ void handleInput(sf::RenderWindow &window)
             {
                 if (inBrush(x, y, xx, yy) && inBounds(xx, yy))
                 {
-                    grid[yy][xx].type = EMPTY;
-                    grid[yy][xx].mass = 0.0f;
+                    cellAt(xx, yy).type = EMPTY;
+                    cellAt(xx, yy).mass = 0.0f;
                 }
             }
         }
@@ -125,7 +125,7 @@ sf::Color getWaterColor(int x, int y, Cell &c)
         sf::Color col(r, g, b);
 
         
-        if (y > 0 && grid[y - 1][x].mass <= MIN_MASS)
+        if (y > 0 && cellAt(x, y - 1).mass <= MIN_MASS)
         {
             col.r += 30;
             col.g += 30;
@@ -134,10 +134,10 @@ sf::Color getWaterColor(int x, int y, Cell &c)
 
         
         bool edge =
-            (y > 0 && grid[y - 1][x].mass <= MIN_MASS) ||
-            (y < largeur - 1 && grid[y + 1][x].mass <= MIN_MASS) ||
-            (x > 0 && grid[y][x - 1].mass <= MIN_MASS) ||
-            (x < hauteur - 1 && grid[y][x + 1].mass <= MIN_MASS);
+            (y > 0 && cellAt(x, y - 1).mass <= MIN_MASS) ||
+            (y < largeur - 1 && cellAt(x, y + 1).mass <= MIN_MASS) ||
+            (x > 0 && cellAt(x - 1, y).mass <= MIN_MASS) ||
+            (x < hauteur - 1 && cellAt(x + 1, y).mass <= MIN_MASS);
 
         if (edge)
         {
@@ -162,32 +162,50 @@ sf::Color getWaterColor(int x, int y, Cell &c)
     return sf::Color(0, 0, blue);
 }
 
-void drawGrid(sf::RenderWindow &window, sf::RectangleShape &cell)
+void addCellQuad(sf::VertexArray &vertices, int x, int y, sf::Color color)
+{
+    float left = x * cellule_taille * 1.0f;
+    float top = y * cellule_taille * 1.0f;
+    float right = left + cellule_taille - 1.0f;
+    float bottom = top + cellule_taille - 1.0f;
+
+    vertices.append(sf::Vertex({ left, top }, color));
+    vertices.append(sf::Vertex({ right, top }, color));
+    vertices.append(sf::Vertex({ right, bottom }, color));
+
+    vertices.append(sf::Vertex({ left, top }, color));
+    vertices.append(sf::Vertex({ right, bottom }, color));
+    vertices.append(sf::Vertex({ left, bottom }, color));
+}
+
+void drawGrid(sf::RenderWindow &window)
 {
     ZoneScopedN("drawGrid");
 
     window.clear(sf::Color::Black);
 
+    static sf::VertexArray vertices(sf::PrimitiveType::Triangles);
+    vertices.clear();
+
     for (int y = 0; y < largeur; y++)
     {
         for (int x = 0; x < hauteur; x++)
         {
-            Cell &c = grid[y][x];
+            Cell &c = cellAt(x, y);
 
             if (c.type == EMPTY)
                 continue;
 
             if (c.type == WALL)
             {
-                cell.setFillColor(sf::Color(200, 200, 200));
+                addCellQuad(vertices, x, y, sf::Color(200, 200, 200));
             }
             if (c.type == WATER)
             {
-                cell.setFillColor(getWaterColor(x, y, c));
+                addCellQuad(vertices, x, y, getWaterColor(x, y, c));
             }
-
-            cell.setPosition({ x * cellule_taille * 1.f, y * cellule_taille * 1.f });
-            window.draw(cell);
         }
     }
+
+    window.draw(vertices);
 }

@@ -1,0 +1,9 @@
+name,src_file,src_line,total_ns,total_perc,counts,mean_ns,min_ns,max_ns,std_ns
+clearNextGrid,C:\ecole\git\c++\projet2\Hana-no-saku-ki\Simulation.cpp,15,476663842,1.581124,1454,327829,282389,1361926,68822.655087
+computeGridStats,C:\ecole\git\c++\projet2\Hana-no-saku-ki\Simulation.cpp,86,159752953,0.529911,1454,109871,93223,386993,27850.942728
+updateFluid,C:\ecole\git\c++\projet2\Hana-no-saku-ki\Simulation.cpp,113,1317721247,4.370966,1454,906273,467043,2137516,179936.138301
+handleEvents,C:\ecole\git\c++\projet2\Hana-no-saku-ki\Rendu.cpp,40,293607832,0.973916,1454,201931,5189,208343958,5467136.998537
+restoreWalls,C:\ecole\git\c++\projet2\Hana-no-saku-ki\Simulation.cpp,29,152902518,0.507187,1454,105159,90409,410805,23413.282282
+drawGrid,C:\ecole\git\c++\projet2\Hana-no-saku-ki\Rendu.cpp,167,21367417276,70.877090,1453,14705724,271848,221291909,23138397.796384
+drawInterface,C:\ecole\git\c++\projet2\Hana-no-saku-ki\Interface.cpp,15,281080945,0.932363,1453,193448,151093,624501,46064.260172
+handleInput,C:\ecole\git\c++\projet2\Hana-no-saku-ki\Rendu.cpp,53,10281605,0.034105,1454,7071,521,243784,18152.383468

@@ -23,10 +23,21 @@ struct Cell
     CellType type = EMPTY;
 };
 
-extern std::vector<std::vector<Cell>> grid;
+struct GridStats
+{
+    int waterCells = 0;
+    int wallCells = 0;
+    float totalMass = 0.0f;
+};
+
+extern std::vector<Cell> grid;
 
 bool inBounds(int x, int y);
+int gridIndex(int x, int y);
+Cell &cellAt(int x, int y);
 bool isSolid(int x, int y);
 float getStableState(float totalMass);
+GridStats computeGridStats();
 void updateFluid();
 void resetGrid();
+void loadBenchmarkScene();

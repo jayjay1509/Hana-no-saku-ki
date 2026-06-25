@@ -144,6 +144,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Benchmark.cpp" />
     <ClCompile Include="ImGuiSFML.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Rendu.cpp" />
@@ -152,6 +153,7 @@
     <ClCompile Include="test 1.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Benchmark.hpp" />
     <ClInclude Include="Interface.hpp" />
     <ClInclude Include="imgui-SFML.h" />
     <ClInclude Include="Rendu.hpp" />

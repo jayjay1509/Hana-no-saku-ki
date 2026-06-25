@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Benchmark.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
     <ClCompile Include="ImGuiSFML.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -35,6 +38,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Benchmark.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
     <ClInclude Include="Interface.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>

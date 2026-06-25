@@ -1,0 +1,11 @@
+Tracy capture command:
+"C:\ecole\git\c++\projet2\Hana-no-saku-ki\tracy\tracy-capture.exe" -o "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_12-29-13\benchmark_capture.tracy" -f -s 10 > "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_12-29-13\tracy_log.txt" 2>&1
+
+
+tracy-capture exit code: 1
+
+Tracy CSV export command:
+"C:\ecole\git\c++\projet2\Hana-no-saku-ki\tracy\tracy-csvexport.exe" "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_12-29-13\benchmark_capture.tracy" > "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_12-29-13\benchmark_zones.csv" 2>> "C:\ecole\git\c++\projet2\Hana-no-saku-ki\benchmarks\2026-06-25_12-29-13\tracy_log.txt"
+
+
+tracy-csvexport exit code: 1
