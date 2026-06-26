@@ -1,61 +1,169 @@
-## 🌊 2D Fluid Simulation using Cellular Automata
+# Hana-no-saku-ki
 
-This project is a real-time 2D fluid simulation developed in C++.  
-It is based on the principles of **cellular automata**, where each cell in a grid follows simple rules to simulate fluid-like behavior.
+Real-time 2D water simulation using cellular automata, written in C++ with SFML, ImGui, and Tracy.
 
-### 🚀 Features
+This project is part of a Bachelor thesis. Its goal is to design, implement, measure, and optimize an interactive grid-based fluid simulation without relying on a full physics engine.
 
-- 🔹 Real-time simulation
-- 🔹 Grid-based system (cellular automata)
-- 🔹 Fluid-like movement (gravity, flow, spreading)
-- 🔹 Lightweight and CPU-based implementation
-- 🔹 Simple and scalable architecture
+## Goal
 
-### 🧠 How it works
+The project simulates water behavior on a 2D grid. Each grid cell can be empty, contain a wall, or contain a certain amount of water mass.
 
-The simulation divides the world into a 2D grid.  
-Each cell contains a quantity of "fluid" and updates its state based on its neighbors.
+The global fluid behavior emerges from local rules:
 
-Basic rules include:
-- Gravity-driven downward flow
-- Horizontal spreading when blocked
-- Pressure balancing between cells
+- downward gravity;
+- horizontal spreading;
+- compression;
+- upward pressure;
+- interaction with obstacles;
+- approximate mass conservation, except in demonstration scenes that intentionally use a source.
 
-Despite the simplicity of these rules, complex and natural fluid behaviors emerge.
+Cellular automata were chosen because they provide a simple, visual, and understandable model that can still produce convincing fluid-like behavior in real time.
 
-### 🛠️ Technologies
+## Technologies
 
-- C++
-- SFML (for rendering)
-- Custom simulation logic
+- C++20
+- SFML 3 for the window, events, and rendering
+- ImGui / ImGui-SFML for the debug interface
+- Tracy for profiling
+- Visual Studio / MSBuild
+- vcpkg for dependencies
 
-### 📈 Goals
+## Architecture
 
-- Explore fluid simulation techniques
-- Compare cellular automata with other methods (Navier-Stokes, SPH)
-- Optimize for real-time performance
-- Potential GPU acceleration (future work)
+The project is split into several modules:
 
-### 📚 Inspiration
+- `test 1.cpp`: application entry point, window creation, and main loop.
+- `Simulation.hpp/.cpp`: grid, cells, fluid rules, and predefined scenes.
+- `Rendu.hpp/.cpp`: grid rendering, view handling, and mouse-to-grid mapping.
+- `Interface.hpp/.cpp`: ImGui interface, controls, settings, and measurements.
+- `Settings.hpp/.cpp`: runtime simulation parameters.
+- `Benchmark.hpp/.cpp`: performance measurements, CSV export, and Tracy integration.
 
-This project is inspired by:
-- Falling sand simulations
-- Cellular automata systems
-- Game physics engines
+The `main` file intentionally stays small. It orchestrates the application loop and delegates simulation, rendering, interface, and benchmarking logic to dedicated modules.
 
-### ⚠️ Limitations
+## Features
 
-- Not physically accurate (approximation)
-- Limited pressure simulation
-- CPU performance constraints
+- Interactive 2D water simulation.
+- Add water with the left mouse button.
+- Add walls with the right mouse button.
+- Erase cells with the middle mouse button.
+- Adjustable brush size.
+- Optional circular brush.
+- Pause and step-by-step simulation.
+- Optional pressure colors.
+- Runtime simulation settings:
+  - maximum flow;
+  - viscosity;
+  - compressibility;
+  - alternating update direction;
+  - stable water noise.
+- Configurable grid size.
+- Resizable window with correct grid scaling.
+- Correct mouse alignment after window resizing.
+- Adjustable FPS limiter.
+- Benchmark scene.
+- Pressure demonstration scene with two connected reservoirs.
+- Automatic 10-second benchmark run.
+- Benchmark results exported to timestamped folders.
+- Tracy instrumentation.
 
-### 🔮 Future Improvements
+## Simulation Model
 
-- GPU implementation (OpenCL / CUDA)
-- Better pressure handling
-- More fluid types (water, lava, etc.)
-- Interaction tools
+The grid is stored as a contiguous 1D array:
 
----
+```cpp
+std::vector<Cell> grid;
+```
 
-Made with ❤️ by Jayson
+2D coordinates are converted to a 1D index:
+
+```cpp
+index = y * hauteur + x;
+```
+
+Each cell stores a type and a water mass:
+
+```cpp
+struct Cell
+{
+    float mass;
+    CellType type;
+};
+```
+
+Available cell types:
+
+- `EMPTY`
+- `WATER`
+- `WALL`
+
+Each frame, the simulation applies local flow rules to all water cells. A double-buffering approach is used: the current state is read from `grid`, the next state is written to `nextGrid`, and both buffers are swapped at the end of the update.
+
+## Rendering
+
+Rendering uses an `sf::VertexArray` instead of drawing one SFML rectangle per cell. This greatly reduces the number of draw calls.
+
+Each visible cell is converted into two triangles, and the whole grid is rendered with a single draw call:
+
+```cpp
+window.draw(vertices);
+```
+
+The SFML view is recalculated when the window size changes so that the grid keeps its aspect ratio. Mouse input uses `mapPixelToCoords`, which keeps cell selection accurate after resizing.
+
+## Benchmarking
+
+The `Run 10s benchmark` button starts an automatic 10-second benchmark. Results are stored in:
+
+```text
+benchmarks/YYYY-MM-DD_HH-MM-SS/
+```
+
+The benchmark can generate:
+
+- a summary CSV file;
+- a frame-by-frame CSV file;
+- an information file;
+- a Tracy log;
+- a Tracy capture if `tracy-capture.exe` successfully connects.
+
+Main measured values:
+
+- FPS;
+- total frame time;
+- simulation time;
+- rendering time;
+- interface time;
+- number of water cells;
+- number of wall cells;
+- total water mass.
+
+## Implemented Optimizations
+
+Three main optimizations have already been implemented and compared through benchmark runs:
+
+1. Reusing a persistent double buffer instead of recreating a temporary grid every frame.
+2. Replacing `std::vector<std::vector<Cell>>` with a contiguous 1D array.
+3. Replacing per-cell draw calls with batched rendering through `sf::VertexArray`.
+
+These optimizations target:
+
+- memory allocations;
+- cache locality and CPU memory access;
+- rendering overhead and draw call count.
+
+## Predefined Scenes
+
+### Benchmark scene
+
+A stable test scene used to compare performance between different code versions. It contains water, walls, and obstacles, providing a repeatable workload for benchmark runs.
+
+### Pressure demo
+
+A demonstration scene with two same-sized reservoirs connected at the bottom. A temporary water source fills the left reservoir for a duration based on the grid size. The source then stops automatically, allowing the simulation to show pressure and water-level balancing between both reservoirs.
+
+## Current State
+
+The project currently builds in `Debug|x64`. The latest checks produced `0 errors`; only external SFML warnings remain.
+
+The next recommended step is to continue optimization incrementally, keeping a benchmark result before and after each change.

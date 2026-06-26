@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cmath>
 #include <cstdlib>
 #include <imgui.h>
 #include "imgui-SFML.h"
@@ -12,6 +13,39 @@
 
 bool showPressure = true;
 int brushSize = 1;
+
+sf::Vector2f gridWorldSize()
+{
+    return {
+        hauteur * cellule_taille * 1.0f,
+        largeur * cellule_taille * 1.0f
+    };
+}
+
+sf::View makeGridView(const sf::RenderWindow &window)
+{
+    sf::Vector2f worldSize = gridWorldSize();
+    sf::View view(sf::FloatRect({ 0.0f, 0.0f }, worldSize));
+
+    sf::Vector2u windowSize = window.getSize();
+    float windowRatio = windowSize.y > 0 ? (windowSize.x * 1.0f) / (windowSize.y * 1.0f) : 1.0f;
+    float worldRatio = worldSize.x / worldSize.y;
+
+    if (windowRatio > worldRatio)
+    {
+        float viewportWidth = worldRatio / windowRatio;
+        float viewportLeft = (1.0f - viewportWidth) / 2.0f;
+        view.setViewport(sf::FloatRect({ viewportLeft, 0.0f }, { viewportWidth, 1.0f }));
+    }
+    else
+    {
+        float viewportHeight = windowRatio / worldRatio;
+        float viewportTop = (1.0f - viewportHeight) / 2.0f;
+        view.setViewport(sf::FloatRect({ 0.0f, viewportTop }, { 1.0f, viewportHeight }));
+    }
+
+    return view;
+}
 
 bool keyPressedOnce(sf::Keyboard::Key key)
 {
@@ -52,9 +86,10 @@ void handleInput(sf::RenderWindow &window)
 {
     ZoneScopedN("handleInput");
 
-    auto pos = sf::Mouse::getPosition(window);
-    int x = pos.x / cellule_taille;
-    int y = pos.y / cellule_taille;
+    sf::View gridView = makeGridView(window);
+    auto worldPos = window.mapPixelToCoords(sf::Mouse::getPosition(window), gridView);
+    int x = (int)std::floor(worldPos.x / cellule_taille);
+    int y = (int)std::floor(worldPos.y / cellule_taille);
 
     if (ImGui::GetIO().WantCaptureMouse)
         return;
@@ -183,6 +218,8 @@ void drawGrid(sf::RenderWindow &window)
     ZoneScopedN("drawGrid");
 
     window.clear(sf::Color::Black);
+    sf::View previousView = window.getView();
+    window.setView(makeGridView(window));
 
     static sf::VertexArray vertices(sf::PrimitiveType::Triangles);
     vertices.clear();
@@ -208,4 +245,5 @@ void drawGrid(sf::RenderWindow &window)
     }
 
     window.draw(vertices);
+    window.setView(previousView);
 }

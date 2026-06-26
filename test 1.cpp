@@ -12,47 +12,15 @@ namespace
 {
     sf::VideoMode windowedMode()
     {
-        return sf::VideoMode({ hauteur * cellule_taille, largeur * cellule_taille });
+        return sf::VideoMode({
+            static_cast<unsigned int>(hauteur * cellule_taille),
+            static_cast<unsigned int>(largeur * cellule_taille)
+        });
     }
 
     void applyFramerateLimit(sf::RenderWindow &window)
     {
         window.setFramerateLimit(limitFramerate ? targetFramerate : 0);
-    }
-
-    bool recreateWindow(sf::RenderWindow &window)
-    {
-        ImGui::SFML::Shutdown();
-
-        if (fullscreenEnabled)
-        {
-            window.create(
-                sf::VideoMode::getDesktopMode(),
-                "Fluid Simulation - Walls + Pressure",
-                sf::Style::Default,
-                sf::State::Fullscreen
-            );
-        }
-        else
-        {
-            window.create(
-                windowedMode(),
-                "Fluid Simulation - Walls + Pressure",
-                sf::Style::Default,
-                sf::State::Windowed
-            );
-        }
-
-        if (!window.setActive(true))
-            return false;
-
-        applyFramerateLimit(window);
-
-        if (!ImGui::SFML::Init(window))
-            return false;
-
-        ImGui::GetIO().IniFilename = nullptr;
-        return true;
     }
 }
 
@@ -60,13 +28,12 @@ int main()
 {
     sf::RenderWindow window(
         windowedMode(),
-        "Fluid Simulation - Walls + Pressure"
+        "Fluid Simulation - Hana-no-saku-ki "
     );
 
     applyFramerateLimit(window);
     bool appliedLimitFramerate = limitFramerate;
     int appliedTargetFramerate = targetFramerate;
-    bool appliedFullscreen = fullscreenEnabled;
 
     sf::Clock deltaClock;
 
@@ -82,17 +49,6 @@ int main()
     {
         auto frameStart = std::chrono::steady_clock::now();
         startBenchmarkIfRequested(frameStart);
-
-        if (appliedFullscreen != fullscreenEnabled)
-        {
-            if (!recreateWindow(window))
-                return 1;
-
-            appliedFullscreen = fullscreenEnabled;
-            appliedLimitFramerate = limitFramerate;
-            appliedTargetFramerate = targetFramerate;
-            deltaClock.restart();
-        }
 
         if (appliedLimitFramerate != limitFramerate || appliedTargetFramerate != targetFramerate)
         {

@@ -3,8 +3,8 @@
 #include <vector>
 
 const int cellule_taille = 6;
-const int hauteur = 200;
-const int largeur = 120;
+extern int hauteur;
+extern int largeur;
 
 const float MAX_MASS = 1.0f;
 const float MAX_COMP = 0.25f;
@@ -40,4 +40,6 @@ float getStableState(float totalMass);
 GridStats computeGridStats();
 void updateFluid();
 void resetGrid();
+void resizeGrid(int columns, int rows);
 void loadBenchmarkScene();
+void loadPressureDemoScene();

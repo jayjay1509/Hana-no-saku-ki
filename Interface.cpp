@@ -4,6 +4,7 @@
 #include "Settings.hpp"
 #include "Simulation.hpp"
 
+#include <algorithm>
 #include <imgui.h>
 #include <tracy/Tracy.hpp>
 
@@ -11,11 +12,12 @@ bool simulationPaused = false;
 bool stepSimulation = false;
 bool limitFramerate = true;
 int targetFramerate = 60;
-bool fullscreenEnabled = false;
 
 void drawInterface()
 {
     ZoneScopedN("drawInterface");
+    static int pendingColumns = hauteur;
+    static int pendingRows = largeur;
 
     ImGui::Begin("Simulation");
 
@@ -25,7 +27,6 @@ void drawInterface()
         stepSimulation = true;
 
     ImGui::Checkbox("Pressure colors", &showPressure);
-    ImGui::Checkbox("Fullscreen", &fullscreenEnabled);
     ImGui::Checkbox("Limit FPS", &limitFramerate);
     ImGui::BeginDisabled(!limitFramerate);
     ImGui::SliderInt("FPS cap", &targetFramerate, 30, 240);
@@ -33,11 +34,29 @@ void drawInterface()
     ImGui::SliderInt("Brush size", &brushSize, 1, 8);
     ImGui::Checkbox("Circular brush", &settings.circularBrush);
 
+    if (ImGui::CollapsingHeader("Grid size"))
+    {
+        ImGui::InputInt("Grid columns", &pendingColumns);
+        ImGui::InputInt("Grid rows", &pendingRows);
+        pendingColumns = std::clamp(pendingColumns, 20, 600);
+        pendingRows = std::clamp(pendingRows, 20, 400);
+
+        ImGui::BeginDisabled(pendingColumns == hauteur && pendingRows == largeur);
+        if (ImGui::Button("Apply grid size"))
+            resizeGrid(pendingColumns, pendingRows);
+        ImGui::EndDisabled();
+
+        ImGui::Text("Current grid: %d x %d cells", hauteur, largeur);
+    }
+
     if (ImGui::Button("Reset"))
         resetGrid();
     ImGui::SameLine();
     if (ImGui::Button("Benchmark scene"))
         loadBenchmarkScene();
+    ImGui::SameLine();
+    if (ImGui::Button("Pressure demo"))
+        loadPressureDemoScene();
     ImGui::SameLine();
     ImGui::BeginDisabled(benchmarkStats.running);
     if (ImGui::Button("Run 10s benchmark"))
