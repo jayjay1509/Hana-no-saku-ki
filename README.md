@@ -158,12 +158,3 @@ These optimizations target:
 
 A stable test scene used to compare performance between different code versions. It contains water, walls, and obstacles, providing a repeatable workload for benchmark runs.
 
-### Pressure demo
-
-A demonstration scene with two same-sized reservoirs connected at the bottom. A temporary water source fills the left reservoir for a duration based on the grid size. The source then stops automatically, allowing the simulation to show pressure and water-level balancing between both reservoirs.
-
-## Current State
-
-The project currently builds in `Debug|x64`. The latest checks produced `0 errors`; only external SFML warnings remain.
-
-The next recommended step is to continue optimization incrementally, keeping a benchmark result before and after each change.
